@@ -1,7 +1,10 @@
 # DS644-Section854-MapReduceProject
 final project for course ds644 - Introduction to big data
 
+## Installation and Setup Instructions: Ubuntu Server or any linux distro
+
 ## Prerequisites:
+Ensure that openssh is installed, pdsh is installed and java is installed. Follow the commands to install
 ```
 sudo apt-get install ssh
 sudo apt-get install pdsh
