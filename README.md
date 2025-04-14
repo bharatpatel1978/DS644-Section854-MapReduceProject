@@ -1,23 +1,49 @@
 # DS644-Section854-MapReduceProject
 final project for course ds644 - Introduction to big data
-Prerequisites:
+
+## Prerequisites:
 sudo apt-get install ssh
 sudo apt-get install pdsh
 sudo apt-get install openjdk-8-jdk
 
 Other helpful tools that you may want to install:
-sudo apt-get net-tools
-sudo apt-get smartmontools
-sudo apt-get sysstat
+sudo apt-get install net-tools
+sudo apt-get install smartmontools
+sudo apt-get install sysstat
 
-Configure bash profile - add this to the end and execute bash (Note: easy way to execute bash is to logg off and log on or reboot)
+## Additional - 
+hadoopuser is the user that I created and used for hadoop. This user is created for every node as part of my implementation. 
+To unzip tar files use the command - ``` tar -xvzf <filename> ``` Example ```tar -xvzf hadoop-3.4.1.tar.gz```
+You can scp to transfer the files across nodes.
+
+### Setting up passwordless access:
+1. Use this command to generate ssh key ```ssh-keygen -t rsa -N "" -f /home/hadoopuser/.ssh/id_rsa```
+2. Now copy all the public keys from all the nodes using the command ```cat .ssh/id_rsa.pub```
+3. Once all the public keys are copied, you need to add all these keys to all the machines/nodes authorized_keys files. You can use VIM or nano commandline editor or anyother way that you find suitable to add this information to the file.
+4. Now you need to test by performing ssh connection using the command ```ssh nodename``` Example '''ssh bigdata-datanode1``` from let's say bigdata-server. Make sure that all the nodes are reachable.
+5. You may need to modify the hosts file for dns name to ip translations if not available.
+
+### Network translation basics:
+You can edit the hosts file and add the IP and host names. Example Command to use ```sudo nano /etc/hosts``` or ```sudo vim /etc/hosts```. This is not recommended for production as mostly its expected to have better elaborte manner of handling dns translations.
+
+## Configuration
+
+### Setting up bash profile
+Configure bash profile - add this to the end and execute bash (Note: easy way to execute bash is to logg off and log on or reboot) . Depending on the linux verion and flavour, this file can be .bashrc or .bash_profile or .profile file or anything else. You may need to find that out.
+Hint: - if you hit an empty file, you are most likely at a wrong place as this file have additional script content.
+
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export PATH=$JAVA_HOME/bin:$PATH
+export PATH=$JAVA_HOME/sbin:$PATH
 export HADOOP_HOME=/home/ubuntu/hadoop-3.4.1
 export PATH=$HADOOP_HOME/bin:$PATH
-export PATH=$JAVA_HOME/sbin:$PATH
+export HADOOP_MAPPED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
 export PDSH_RCMD_TYPE=ssh
 
+### Downloading Hadoop and some basic settings:
 download  hadoop - https://archive.apache.org/dist/hadoop/common/hadoop-3.4.1/hadoop-3.4.1.tar.gz
 Extract Hadoop - tar -xvzf hadoop-3.4.1.tar.gz
 
@@ -27,7 +53,7 @@ Configure the files -
 3. mapred-site.xml
 4. yarn-site.xml
 5. hadoop-env.sh
-6. 
+6.  workers
 
 ## Core-site.xml
 ```
@@ -84,7 +110,7 @@ Configure the files -
     </property>
     <property>
         <name>dfs.namenode.data.dir</name>
-        <value>[DISK]file:///home/ubuntu/hadoop-3.4.1/dfs/data/</value>
+        <value>[DISK]file:///home/hadoopuser/hadoop-3.4.1/dfs/data/</value>
         <!--
             ### Pay Attention ### -
             This is the path we describe where the files will get stored on the worker nodes. Make sure that such path exist for each worker node.
@@ -168,3 +194,55 @@ Configure the files -
     </property>
 </configuration>
 ```
+### yarn-site.xml
+```
+<configuration>
+        <property>
+                <name>yarn.acl.enable</name>
+                <value>false</value>
+                <!--
+                    ### Pay Attention ### -
+                    We are suggesting that we do not intend to use access control. This will be important for production grade setup as you may need this info to control access and also for auditing.
+                -->
+        </property>
+        <property>
+                <name>yarn.resourcemanage.address</name>
+                <value>bigdata-server:8032</value>                
+        </property>
+        <property>
+                <name>yarn.resourcemanager.scheduler.address</name>
+                <value>bigdata-server:8030</value>                
+        </property>
+        <property>
+                <name>yarn.resourcemanager.resource-tracker.address</name>
+                <value>bigdata-server:8035</value>                
+        </property>
+        <property>
+                <name>yarn.resourcemanager.admin.address</name>
+                <value>bigdata-server:8033</value>                
+        </property>
+        <property>
+                <name>yearn.resourcemanager.webapp.address</name>
+                <value>bigdata-server:8088</value>
+        </property>
+        <property>
+                <name>yarn.nodemanager.aux-services</name>
+                <value>mapreduce_shuffle</value>
+        </property>        
+        <property>
+                <name>yarn.nodemanager.aux-service.mapreduce.shuffle.class</name>
+                <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+        </property>
+</configuration>
+```
+### hadoop-env.sh
+
+Ensure that JAVA_HOME is supplied. Optionally, you can also supply configure memory usage for name node.
+```
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export HDFS_NAMENODE_OPTS="-XX:+UseParallelGC -Xmx4g"
+```
+
+### workers 
+
+This file will have the dns name of all the data nodes in the cluster. It needs paswordless SSH to be setup across the cluster.
