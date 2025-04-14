@@ -30,6 +30,7 @@ Configure the files -
 6. 
 
 ## Core-site.xml
+```
 <configuration>
     <property>
         <name>io.file.buffer.size</name>
@@ -56,8 +57,9 @@ Configure the files -
         <value>simple</value> ### pay attention - this is saying the we are not going to use kerbros authentication and instead its simple authentication. This may/is production grade setting as every organisation has different security standards.
     </property>
 </configuration>
-
+```
 ## hdfs-site.xml
+```
 <configuration>
     <property>
         <name>dfs.namenode.name.dir</name>
@@ -72,3 +74,5 @@ Configure the files -
         <value>2</value> ### pay attention - this is the number of data copies that you want hadoop to maintian across data nodes for fault tolerance. Ideal is 3 but since I have just 2 data nodes, I have kept it to 2. You don't need to match this to data nodes but this number cannot exceed the number data nodes.
     </property>
 </configuration>
+```
+```
