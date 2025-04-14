@@ -2,15 +2,17 @@
 final project for course ds644 - Introduction to big data
 
 ## Prerequisites:
+```
 sudo apt-get install ssh
 sudo apt-get install pdsh
 sudo apt-get install openjdk-8-jdk
-
+```
 Other helpful tools that you may want to install:
+```
 sudo apt-get install net-tools
 sudo apt-get install smartmontools
 sudo apt-get install sysstat
-
+```
 ## Additional - 
 hadoopuser is the user that I created and used for hadoop. This user is created for every node as part of my implementation. 
 To unzip tar files use the command - ``` tar -xvzf <filename> ``` Example ```tar -xvzf hadoop-3.4.1.tar.gz```
@@ -31,7 +33,7 @@ You can edit the hosts file and add the IP and host names. Example Command to us
 ### Setting up bash profile
 Configure bash profile - add this to the end and execute bash (Note: easy way to execute bash is to logg off and log on or reboot) . Depending on the linux verion and flavour, this file can be .bashrc or .bash_profile or .profile file or anything else. You may need to find that out.
 Hint: - if you hit an empty file, you are most likely at a wrong place as this file have additional script content.
-
+```
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export PATH=$JAVA_HOME/bin:$PATH
 export PATH=$JAVA_HOME/sbin:$PATH
@@ -42,7 +44,7 @@ export HADOOP_COMMON_HOME=$HADOOP_HOME
 export HADOOP_HDFS_HOME=$HADOOP_HOME
 export YARN_HOME=$HADOOP_HOME
 export PDSH_RCMD_TYPE=ssh
-
+```
 ### Downloading Hadoop and some basic settings:
 download  hadoop link - https://archive.apache.org/dist/hadoop/common/hadoop-3.4.1/hadoop-3.4.1.tar.gz. command ```wget https://archive.apache.org/dist/hadoop/common/hadoop-3.4.1/hadoop-3.4.1.tar.gz```
 Extract Hadoop - ```tar -xvzf hadoop-3.4.1.tar.gz```
