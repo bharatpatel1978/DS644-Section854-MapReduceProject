@@ -44,8 +44,8 @@ export YARN_HOME=$HADOOP_HOME
 export PDSH_RCMD_TYPE=ssh
 
 ### Downloading Hadoop and some basic settings:
-download  hadoop - https://archive.apache.org/dist/hadoop/common/hadoop-3.4.1/hadoop-3.4.1.tar.gz
-Extract Hadoop - tar -xvzf hadoop-3.4.1.tar.gz
+download  hadoop link - https://archive.apache.org/dist/hadoop/common/hadoop-3.4.1/hadoop-3.4.1.tar.gz. command ```wget https://archive.apache.org/dist/hadoop/common/hadoop-3.4.1/hadoop-3.4.1.tar.gz```
+Extract Hadoop - ```tar -xvzf hadoop-3.4.1.tar.gz```
 
 Configure the files - 
 1. core-site.xml
