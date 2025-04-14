@@ -245,4 +245,4 @@ export HDFS_NAMENODE_OPTS="-XX:+UseParallelGC -Xmx4g"
 
 ### workers 
 
-This file will have the dns name of all the data nodes in the cluster. It needs paswordless SSH to be setup across the cluster.
+This file will have the dns names of all the data nodes in the cluster. It needs paswordless SSH to be setup across the cluster. Alternate way to estabilsh connection could be to specify the IP Addresses.
