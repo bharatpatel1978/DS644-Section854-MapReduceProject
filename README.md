@@ -38,11 +38,19 @@ Configure the files -
     </property>
     <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://bigdata-server:9000</value> ### pay attention - this is the name of the leader machine. You may have a different name.
+        <value>hdfs://bigdata-server:9000</value>
+        <!--
+            ### Pay Attention ### -
+            This is the name of the leader machine. You may have a different name.
+        -->
     </property>
     <property>
         <name>hadoop.tmp.dir</name>
-        <value>/home/ubuntu/hadoop-3.4.1/tmp</value> ### pay attention - this is the path where we describe the location for tmp directory. You can have it anywhere on your local.
+        <value>/home/hadoopuser/hadoop-3.4.1/tmp</value>
+        <!--
+            ### Pay Attention ### -
+            This is the path where we describe the location for tmp directory. You can have it anywhere on your local.
+        -->
     </property>
     <property>
         <name>ipc.client.connect.timeout</name>
@@ -54,7 +62,12 @@ Configure the files -
     </property>
     <property>
         <name>hadoop.security.authentication</name>
-        <value>simple</value> ### pay attention - this is saying the we are not going to use kerbros authentication and instead its simple authentication. This may/is production grade setting as every organisation has different security standards.
+        <value>simple</value>
+        <!--
+            ### Pay Attention ### -
+            This is saying the we are not going to use kerbros authentication and instead its simple authentication.
+            This may/is production grade setting as every organisation has different security standards.
+        -->
     </property>
 </configuration>
 ```
@@ -63,16 +76,95 @@ Configure the files -
 <configuration>
     <property>
         <name>dfs.namenode.name.dir</name>
-        <value>/home/ubuntu/hadoop-3.4.1/dfs/name</value> ### pay attention - this is the path where we describe the location for name node index data to be stored. This is internal to hadoop functioning. this is relevant to leader node/master node.
+        <value>/home/hadoopuser/hadoop-3.4.1/dfs/name</value>
+        <!--
+            ### Pay Attention ### -
+            This is the path where we describe the location for name node index data to be stored. This is internal to hadoop functioning. This is relevant to leader node/master node.
+        -->
     </property>
     <property>
         <name>dfs.namenode.data.dir</name>
-        <value>[DISK]file:///home/ubuntu/hadoop-3.4.1/dfs/data/</value>  ### pay attention - this is the path we describe where the files will get stored on the worker nodes. Make sure that such path exist for them.
+        <value>[DISK]file:///home/ubuntu/hadoop-3.4.1/dfs/data/</value>
+        <!--
+            ### Pay Attention ### -
+            This is the path we describe where the files will get stored on the worker nodes. Make sure that such path exist for each worker node.
+            Next - hadoop has introduce a new concept of storage policy. More Info - https://hadoop.apache.org/docs/r3.4.1/hadoop-project-dist/hadoop-hdfs/ArchivalStorage.html
+            Possible values can be DISK, SSD, ARCHIVE, RAM_DISK, NVDIMM.            
+        -->
     </property>
     <property>
         <name>dfs.replication</name>
-        <value>2</value> ### pay attention - this is the number of data copies that you want hadoop to maintian across data nodes for fault tolerance. Ideal is 3 but since I have just 2 data nodes, I have kept it to 2. You don't need to match this to data nodes but this number cannot exceed the number data nodes.
+        <value>2</value>
+        <!--
+            ### Pay Attention ### -
+            This is the number of data copies that you want hadoop to maintian across data nodes for fault tolerance.
+            Ideal is 3 for decent fault tolerance. Most businesses may find 2 copies to be sufficient for analytical purposes. Important - Replication value cannot exceed worker nodes.
     </property>
 </configuration>
 ```
+### mapred-site.xml
+```
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+    <property>
+        <name>mapreduce.map.memory.mb</name>
+        <value>4096</value>
+    </property>
+    <property>
+        <name>mapreduce.map.java.opts</name>
+        <value>-Xmx3072m</value>
+    </property>
+    <property>
+        <name>mapreduce.reduce.memory.mb</name>
+        <value>4096</value>
+    </property>
+    <property>
+        <name>mapreduce.reduce.java.opts</name>
+        <value>-Xmx3072m</value>
+    </property>
+    <property>
+        <name>mapreduce.task.io.sort.mb</name>
+        <value>512</value>
+    </property>
+    <property>
+        <name>mapreduce.task.io.sort.factor</name>
+        <value>100</value>
+    </property>
+    <property>
+        <name>mapreduce.application.classpath</name>
+        <value>$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*:$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*</value>
+        <!--
+            ### Pay Attention ### -
+            Hadoop directory has a share sub durectory and heirarchy. It should all resolve to valid path for all jar files as they get added to classpath.
+            Convention is that the paths are all identical across all the machines to avoid failures.
+        -->
+    </property>
+    <property>
+        <name>yarn.app.mapreduce.am.env</name>
+        <value>HADOOP_MAPRED_HOME=/home/hadoopuser/hadoop-3.4.1</value>
+        <!--
+            ### Pay Attention ### -
+            This is the installation path of hadoop. You may have it at different location
+        -->
+    </property>
+    <property>
+        <name>mapreduce.map.env</name>
+        <value>HADOOP_MAPRED_HOME=/home/hadoopuser/hadoop-3.4.1</value>
+        <!--
+            ### Pay Attention ### -
+            This is the installation path of hadoop. You may have it at different location
+        -->
+    </property>
+    <property>
+        <name>mapreduce.reduce.env</name>
+        <value>HADOOP_MAPRED_HOME=/home/hadoopuser/hadoop-3.4.1</value>
+        <!--
+            ### Pay Attention ### -
+            This is the installation path of hadoop. You may have it at different location
+        -->
+    </property>
+</configuration>
 ```
