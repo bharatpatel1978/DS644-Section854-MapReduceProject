@@ -74,7 +74,7 @@ public class MovieRatings {
 		job.setMapperClass(RatingsMapper.class);
 		job.setReducerClass(RatingsReducer.class);
 		job.setOutputKeyClass(LongWritable.class);
-		job.setOutputValueClass(DoubleWritable.class);
+		job.setOutputValueClass(DoubleWritable.class);		
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
