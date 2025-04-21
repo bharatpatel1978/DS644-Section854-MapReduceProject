@@ -1,7 +1,10 @@
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -12,8 +15,8 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class MovieRatings {
 
-	public static class RatingsMapper extends Mapper<LongWritable, Text, LongWritable, DoubleWritable> {
-		private DoubleWritable rating = new DoubleWritable();
+	public static class RatingsMapper extends Mapper<LongWritable, Text, LongWritable, IntWritable> {
+		private IntWritable rating = new IntWritable();
 
 		@Override
 		protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -25,7 +28,7 @@ public class MovieRatings {
 				for(String line : lines) {
 					if (line.contains(",")) {
 						String[] row = line.split(",");
-						double ratingValue = Double.parseDouble(row[1].trim());
+						int ratingValue = Integer.parseInt(row[1].trim());
 						rating.set(ratingValue); // Set rating as value
 						context.write(key, rating);
 					}
@@ -41,23 +44,19 @@ public class MovieRatings {
 		}
 	}
 
-	public static class RatingsReducer extends Reducer<LongWritable, DoubleWritable, LongWritable, DoubleWritable> {		
+	public static class RatingsReducer extends Reducer<LongWritable, IntWritable, LongWritable, StatsWritable> {		
 		@Override
-		protected void reduce(LongWritable key, Iterable<DoubleWritable> values, Context context)
-				throws IOException, InterruptedException {
-			double sum = 0;
-			int count = 0;
-			try {				
-				for (DoubleWritable value : values) {
-					sum += value.get();
-					count++;
-				}
-				if (count > 0) {
-					double average = sum / count;
-					context.write(key, new DoubleWritable(average));
-				} else {
-					System.err.println("No ratings for movie ID: " + key.toString());
-				}
+		protected void reduce(LongWritable key, Iterable<IntWritable> values, Context context)
+				throws IOException, InterruptedException {			
+			try {
+					List<Integer> ratings = new ArrayList<>();
+					for (IntWritable val : values) {
+			            ratings.add(val.get());			            
+			        }					
+					Stats stats = new Stats(ratings);					
+					StatsWritable obj = new StatsWritable(stats);
+//					System.err.println("key: " + key.toString() + "value: " + stats.toString());
+					context.write(key, obj);
 			} catch (Exception e) {
 				System.err.println(
 						"Reduce Method - Invalid record ID: " + key.toString() + " Exception: " + e.getMessage());
@@ -72,11 +71,14 @@ public class MovieRatings {
 		// Set custom input format
 		job.setInputFormatClass(MovieInputFormat.class);
 		job.setMapperClass(RatingsMapper.class);
-		job.setReducerClass(RatingsReducer.class);
+		job.setReducerClass(RatingsReducer.class);	
+		job.setMapOutputKeyClass(LongWritable.class);
+		job.setMapOutputValueClass(IntWritable.class);
 		job.setOutputKeyClass(LongWritable.class);
-		job.setOutputValueClass(DoubleWritable.class);		
+		job.setOutputValueClass(StatsWritable.class);		
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
 	}
 }
